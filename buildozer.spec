@@ -1,15 +1,10 @@
-# This .spec config file tells Buildozer an app's requirements for being built.
-#
-# It largely follows the syntax of an .ini file.
-# See the end of the file for more details and warnings about common mistakes.
-
 [app]
 
 # (str) Title of your application
-title = BusnessSojaApp
+title = GestBusn
 
 # (str) Package name
-package.name = busnessapp
+package.name = GestBusnApp
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
@@ -17,16 +12,16 @@ package.domain = org.test
 # (str) Source code where the main.py live
 source.dir = .
 
-# (list) Source files to include (leave empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas, db
+# (list) Source files to include (let empty to include all the files)
+source.include_exts = py,png,jpg,kv,atlas,db
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png
 
-# (list) Source files to exclude (leave empty to not exclude anything)
+# (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
 
-# (list) List of directory to exclude (leave empty to not exclude anything)
+# (list) List of directory to exclude (let empty to not exclude anything)
 #source.exclude_dirs = tests, bin, venv
 
 # (list) List of exclusions using pattern matching
@@ -49,22 +44,16 @@ requirements = python3,kivy,kivymd,pillow
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-presplash.filename = %(source.dir)s/images/previous.png
+#presplash.filename = %(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-icon.filename = %(source.dir)s/images/previous.png
+#icon.filename = %(source.dir)s/data/icon.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
 orientation = portrait
 
-# (list) List of services to declare
-# This is currently only relevant to Android services.
-# Each service consists of a name (a valid Java class name, with the first letter capitalized)
-# followed by a colon, followed by the name of the Python script (.py file) that should be
-# launched. This is optionally followed by ":foreground" for foreground services or
-# ":foreground:sticky" for sticky foreground services. The default is a background service.
-# Bound services are not supported.
+# (list) List of service to declare
 #services = NAME:ENTRYPOINT_TO_PY,NAME2:ENTRYPOINT2_TO_PY
 
 #
@@ -74,8 +63,11 @@ orientation = portrait
 #
 # author = © Copyright Info
 
+# change the major version of python used by the app
+osx.python_version = 3
+
 # Kivy version to use
-osx.kivy_version = 2.2.0
+osx.kivy_version = 1.9.1
 
 #
 # Android specific
@@ -123,6 +115,9 @@ fullscreen = 0
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 #android.ndk_api = 21
 
+# (bool) Use --private data storage (True) or --dir public storage (False)
+#android.private_storage = True
+
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
 #android.ndk_path =
 
@@ -132,7 +127,7 @@ fullscreen = 0
 # (str) ANT directory (if empty, it will be automatically downloaded.)
 #android.ant_path =
 
-# (bool) If True, then skip trying to update the Android SDK
+# (bool) If True, then skip trying to update the Android sdk
 # This can be useful to avoid excess Internet downloads or save time
 # when an update is due and you just want to test/build your package
 # android.skip_update = False
@@ -167,9 +162,6 @@ fullscreen = 0
 
 # (list) Pattern to whitelist for the whole project
 #android.whitelist =
-
-# (bool) If True, your application will be listed as a home app (launcher app)
-# android.home_app = False
 
 # (str) Path to a custom whitelist file
 #android.whitelist_src =
@@ -329,12 +321,12 @@ android.allow_backup = True
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-p4a.branch = develop
+#p4a.branch = master
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD
 
-# (str) python-for-android git clone directory
+# (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
 #p4a.source_dir =
 
 # (str) The directory in which python-for-android should look for your own build recipes (if any)
@@ -344,7 +336,6 @@ p4a.branch = develop
 #p4a.hook =
 
 # (str) Bootstrap to use for android builds
-# Run "buildozer android p4a -- bootstraps" for a list of valid values.
 # p4a.bootstrap = sdl2
 
 # (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
@@ -377,7 +368,7 @@ ios.kivy_ios_branch = master
 #ios.ios_deploy_dir = ../ios_deploy
 # Or specify URL and branch
 ios.ios_deploy_url = https://github.com/phonegap/ios-deploy
-ios.ios_deploy_branch = 1.12.2
+ios.ios_deploy_branch = 1.10.0
 
 # (bool) Whether or not to sign the code
 ios.codesign.allowed = false
@@ -422,54 +413,40 @@ warn_on_root = 1
 # (str) Path to build output (i.e. .apk, .aab, .ipa) storage
 # bin_dir = ./bin
 
-#-----------------------------------------------------------------------------
-#   Notes about using this file:
+#    -----------------------------------------------------------------------------
+#    List as sections
 #
-#   Buildozer uses a variant of Python's ConfigSpec to read this file.
-#   For the basic syntax, including interpolations, see
-#       https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
+#    You can define all the "list" as [section:key].
+#    Each line will be considered as a option to the list.
+#    Let's take [app] / source.exclude_patterns.
+#    Instead of doing:
 #
-#   Warning: Comments cannot be used "inline" - i.e.
-#       [app]
-#       title = My Application # This is not a comment, it is part of the title.
+#[app]
+#source.exclude_patterns = license,data/audio/*.wav,data/images/original/*
 #
-#   Warning: Indented text is treated as a multiline string - i.e.
-#       [app]
-#       title = My Application
-#          package.name = myapp # This is all part of the title.
+#    This can be translated into:
 #
-#   Buildozer's .spec files have some additional features:
+#[app:source.exclude_patterns]
+#license
+#data/audio/*.wav
+#data/images/original/*
 #
-#   Buildozer supports lists - i.e.
-#       [app]
-#       source.include_exts = py,png,jpg
-#       #                     ^ This is a list.
+
+
+#    -----------------------------------------------------------------------------
+#    Profiles
 #
-#       [app:source.include_exts]
-#       py
-#       png
-#       jpg
-#       # ^ This is an alternative syntax for a list.
+#    You can extend section / key with a profile
+#    For example, you want to deploy a demo version of your application without
+#    HD content. You could first change the title to add "(demo)" in the name
+#    and extend the excluded directories to remove the HD content.
 #
-#   Buildozer's option names are case-sensitive, unlike most .ini files.
+#[app@demo]
+#title = My Application (demo)
 #
-#   Buildozer supports overriding options through environment variables.
-#   Name an environment variable as SECTION_OPTION to override a value in a .spec
-#   file.
+#[app:source.exclude_patterns@demo]
+#images/hd/*
 #
-#   Buildozer support overriding options through profiles.
-#   For example, you want to deploy a demo version of your application without
-#   HD content. You could first change the title to add "(demo)" in the name
-#   and extend the excluded directories to remove the HD content.
+#    Then, invoke the command line with the "demo" profile:
 #
-#       [app@demo]
-#       title = My Application (demo)
-#
-#       [app:source.exclude_patterns@demo]
-#       images/hd/*
-#
-#   Then, invoke the command line with the "demo" profile:
-#
-#        buildozer --profile demo android debug
-#
-#   Environment variable overrides have priority over profile overrides.
+#buildozer --profile demo android debug
