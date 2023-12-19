@@ -1,50 +1,41 @@
-name: Build
+name: CI
 on:
   push:
-    branches:
-      - 'main'
+    branches: [ main ]
+
 jobs:
-  Build:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-20.04
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
-      - uses: kaisugi/action-regex-match@v1.0.0
-        id: regex-match
-        with:
-          text: ${{ github.event.head_commit.message }}
-          regex: '^v[0-9]+\.[0-9]+\.[0-9]+$'
-
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '21'
-          cache: 'gradle'
-          
-      - name: Move files
-        if: ${{ steps.regex-match.outputs.match != '' }}
+      - name: Get Date
+        id: get-date
         run: |
-          mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
-          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
+        shell: bash
 
-      - name: Build Changelog
-        if: ${{ steps.regex-match.outputs.match != '' }}
-        id: changelog
-        uses: ardalanamini/auto-changelog@v3
+      - name: Cache Buildozer global directory
+        uses: actions/cache@v2
         with:
-          mention-authors: false
-          mention-new-contributors: false
-          include-compare: false
-          semver: false
+          path: .buildozer_global
+          key: buildozer-global-${{ hashFiles('buildozer.spec') }} # Replace with your path
 
-      - name: Create Release
-        if: ${{ steps.regex-match.outputs.match != '' }}
-        id: create_release
-        uses: ncipollo/release-action@v1.13.0
+      - uses: actions/cache@v2
         with:
-          artifacts: "app/build/outputs/app-release-signed.aab, app/build/outputs/app-release-signed.apk"
-          body: ${{ steps.changelog.outputs.changelog }}
-          tag: ${{ github.event.head_commit.message }}
-          name: Release ${{ github.event.head_commit.message }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          path: .buildozer
+          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
+
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          command: buildozer android debug
+          buildozer_version: stable
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: ${{ steps.buildozer.outputs.filename }}
