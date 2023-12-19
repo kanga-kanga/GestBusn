@@ -21,11 +21,7 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
           cache: 'gradle'
-
-      - name: Build App
-        run: |
-          bash ./gradlew assembleRelease
-          bash ./gradlew bundleRelease
+          
       - name: Move files
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: |
